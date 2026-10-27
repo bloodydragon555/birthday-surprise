@@ -99,7 +99,7 @@ footer{position:relative;z-index:2;text-align:center;padding:40px 20px 60px;opac
   <h1 class="script">A surprise for you</h1>
   <p style="opacity:.75;margin-bottom:28px;font-weight:300">Made with all my love, just for one person</p>
   <button class="btn" id="open">Open my gift ♥</button>
-  <button class="link" id="ia" style="display:inline-block">🎵 Add background song</button>
+  <button class="link" id="ia" style="display:inline-block">Love You More Day  by Day </button>
 </div>
 
 <section id="hero">
@@ -202,15 +202,54 @@ const $ = s => document.querySelector(s);
 document.getElementById('nm').textContent = NAME;
 
 // Gallery
+
 const gal = $('#gal');
-caps.forEach((c,i)=>{
-  const d = document.createElement('div'); d.className='polaroid rev';
-  d.innerHTML = `<div class="ph"><span>📷</span>Add photo</div><div class="cap" contenteditable="true" spellcheck="false">${c}</div>`;
+
+const photoPaths = [
+  'photos/image%201.jpg',
+  'photos/image%202.jpg',
+  'photos/image%203.jpg',
+  'photos/image%204.jpg',
+  'photos/image%205.jpg',
+  'photos/image%206.jpg'
+];
+
+caps.forEach((c, i) => {
+  const d = document.createElement('div');
+  d.className = 'polaroid rev';
+
+  d.innerHTML = `
+    <div class="ph">
+      <img
+        src="${photoPaths[i % photoPaths.length]}"
+        alt="Memory ${i + 1}"
+        style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"
+      >
+    </div>
+    <div class="cap" contenteditable="true" spellcheck="false">${c}</div>
+  `;
+
   const ph = d.querySelector('.ph');
-  const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.hidden=true;
-  ph.onclick = () => inp.click();
-  inp.onchange = () => { const f = inp.files[0]; if(!f) return; ph.style.backgroundImage = `url(${URL.createObjectURL(f)})`; ph.innerHTML=''; };
-  d.append(inp); gal.append(d);
+  const img = ph.querySelector('img');
+
+  // Click a photo to replace it
+  ph.style.cursor = 'pointer';
+  ph.onclick = () => {
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = 'image/*';
+
+    inp.onchange = () => {
+      const f = inp.files[0];
+      if (!f) return;
+
+      img.src = URL.createObjectURL(f);
+    };
+
+    inp.click();
+  };
+
+  gal.append(d);
 });
 
 // Memory slideshow (8 photos)
@@ -227,13 +266,21 @@ car.onscroll = () => { const k = Math.round(car.scrollLeft / (car.children[0].of
 car.onscroll();
 
 // Background song
-const aud = new Audio(); aud.loop = true;
-const pick = document.createElement('input'); pick.type='file'; pick.accept='audio/*'; pick.hidden=true; document.body.append(pick);
-function mstate(){ $('#mus').textContent = aud.src ? (aud.paused ? '▶' : '⏸') : '🎵'; $('#chg').style.display = aud.src ? 'flex' : 'none'; }
-pick.onchange = () => { const f = pick.files[0]; if(!f) return; aud.src = URL.createObjectURL(f); aud.play().catch(()=>{}); $('#ia').textContent = '🎵 Song added ✓'; mstate(); };
-$('#ia').onclick = () => pick.click();
-$('#chg').onclick = () => pick.click();
-$('#mus').onclick = () => { if(!aud.src){ pick.click(); return; } aud.paused ? aud.play() : aud.pause(); mstate(); };
+const aud = new Audio('music/music1.mp3');
+aud.loop = true;
+
+function mstate() {
+  $('#mus').textContent = aud.paused ? '▶' : '⏸';
+}
+
+$('#mus').onclick = () => {
+  if (aud.paused) {
+    aud.play().catch(() => {});
+  } else {
+    aud.pause();
+  }
+};
+
 aud.onplay = aud.onpause = mstate;
 
 // Letters
