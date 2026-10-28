@@ -71,7 +71,22 @@ h2{font-size:clamp(2.2rem,7vw,3.4rem);color:var(--gold);margin-bottom:8px}
 .flip .f span{background:rgba(20,5,35,.55);backdrop-filter:blur(4px);padding:7px 16px;border-radius:30px;font-family:'Great Vibes',cursive;font-weight:400;font-size:1.5rem;color:var(--gold)}
 .cam{position:absolute;top:8px;right:8px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:1.1rem;box-shadow:0 4px 12px rgba(0,0,0,.35);z-index:2}
 .flip .b{background:#fff8ee;color:#7a2a50;transform:rotateY(180deg);font-size:.95rem;line-height:1.5}
-.cake svg{width:min(78vw,300px);height:auto;filter:drop-shadow(0 10px 30px rgba(255,107,157,.35))}
+.cake{position:relative;display:inline-block}
+.cake.ready{cursor:pointer}
+.cake svg{display:block;width:min(78vw,300px);height:auto;filter:drop-shadow(0 10px 30px rgba(255,107,157,.35))}
+.cake svg.layer{position:absolute;left:0;top:0}
+.cake svg.inside{opacity:0;filter:none;transition:opacity .15s}
+.cake.cut svg.inside{opacity:1}
+.cake svg.hl{clip-path:inset(0 50% 0 0);transform-origin:0 100%;transition:transform 1.1s cubic-bezier(.2,.9,.25,1.08)}
+.cake svg.hr{clip-path:inset(0 0 0 50%);transform-origin:100% 100%;transition:transform 1.1s cubic-bezier(.2,.9,.25,1.08)}
+.cake.cut svg.hl{transform:translateX(-13%) rotate(-7deg)}
+.cake.cut svg.hr{transform:translateX(13%) rotate(7deg)}
+.cake svg.knife{position:absolute;left:50%;top:0;width:34px;height:auto;filter:drop-shadow(0 6px 8px rgba(0,0,0,.45));transform:translate(-50%,-140%);opacity:0;pointer-events:none;z-index:5}
+.cake.knifing svg.knife{animation:slice 1s ease-in forwards}
+@keyframes slice{0%{opacity:0;transform:translate(-50%,-140%)}15%{opacity:1}72%{opacity:1;transform:translate(-50%,68%)}100%{opacity:0;transform:translate(-50%,90%)}}
+#cutbtn{display:none;margin-top:6px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+#cakeMsg{transition:opacity .6s}
 .fl{transform-box:fill-box;transform-origin:center bottom;animation:flick .3s infinite alternate;transition:opacity .6s}
 @keyframes flick{to{transform:scale(1.12,1.22) rotate(5deg)}}
 .out .fl{opacity:0;animation:none}
@@ -145,9 +160,9 @@ Happy Birthday, my heart. ♥</p>
 
 <section id="cakeSec">
   <h2 class="script rev">Make a Wish</h2>
-  <p class="sub rev">Close your eyes, think of something beautiful, then blow out the candles</p>
+  <p class="sub rev" id="cakeMsg">✨ Close your eyes and make a wish… then blow out the candles ✨</p>
   <div class="cake" id="cake">
-    <svg viewBox="0 0 220 190" aria-label="Birthday cake">
+    <svg class="main" viewBox="0 0 220 190" aria-label="Birthday cake">
       <ellipse cx="110" cy="178" rx="100" ry="10" fill="rgba(0,0,0,.3)"/>
       <rect x="20" y="120" width="180" height="56" rx="12" fill="#ff8fb8"/>
       <rect x="45" y="80" width="130" height="46" rx="10" fill="#ffd27d"/>
@@ -158,10 +173,25 @@ Happy Birthday, my heart. ♥</p>
       <g class="fl"><path d="M110 28c8 10 8 16 0 22c-8-6-8-12 0-22z" fill="#ffb300"/></g>
       <g class="fl"><path d="M144 28c8 10 8 16 0 22c-8-6-8-12 0-22z" fill="#ffb300"/></g>
     </svg>
+    <!-- inside of the cake, visible only when it is cut -->
+    <svg class="layer inside" viewBox="0 0 220 190" aria-hidden="true">
+      <rect x="20" y="120" width="180" height="56" rx="12" fill="#ffd9e8"/>
+      <rect x="45" y="80" width="130" height="46" rx="10" fill="#fff1cf"/>
+      <rect x="24" y="121" width="172" height="4" fill="#ff6b9d"/>
+      <rect x="24" y="148" width="172" height="3" fill="#ff8fb8"/>
+      <rect x="49" y="100" width="122" height="3" fill="#ffd27d"/>
+    </svg>
+    <!-- knife -->
+    <svg class="knife" viewBox="0 0 30 120" aria-hidden="true">
+      <rect x="9" y="0" width="12" height="36" rx="5" fill="#7a3b2e"/>
+      <rect x="6" y="34" width="18" height="5" rx="2" fill="#c9a24b"/>
+      <path d="M7 39h16v68l-8 12-8-12z" fill="#eef3f8" stroke="#9aa9b8" stroke-width="1.2"/>
+    </svg>
   </div><br><br>
   <button class="btn" id="mic">🎤 Tap, then blow on your phone</button>
   <div class="meter"><div id="bar"></div></div>
   <div id="hint2"></div>
+  <button class="btn" id="cutbtn">🔪 Tap to cut the cake</button>
   <button class="link" id="blow">Or tap here to blow out the candles</button>
   <div id="wish" class="script"></div>
 </section>
@@ -296,17 +326,17 @@ const car = $('#car');
 const dots = $('#dots');
 
 const memoryPhotos = [
-  'photos/photo%207.jpg',
-  'photos/photo%208.jpg',
-  'photos/photo%209.jpg',
-  'photos/photo%2010.jpg',
-  'photos/photo%2011.jpg',
-  'photos/photo%2012.jpg',
-  'photos/photo%2013.jpg',
-  'photos/photo%2014.jpg'
+  'photos/image%207.jpg',
+  'photos/image%208.jpg',
+  'photos/image%209.jpg',
+  'photos/image%2010.jpg',
+  'photos/image%2011.jpg',
+  'photos/image%2012.jpg',
+  'photos/image%2013.jpg',
+  'photos/image%2014.jpg'
 ];
 
-// ✏️ Slideshow captions: apni ek-ek line yahan likho (photo 7 se photo 14 ke order me)
+// ✏️ Slideshow captions: apni ek-ek line yahan likho (image 7 se image 14 ke order me)
 const memoryCaps = [
   "The day my world got brighter",
   "Your smile, my favorite view",
@@ -337,7 +367,7 @@ memoryPhotos.forEach((photo, i) => {
 
   img.onerror = () => {
     img.style.display = 'none';
-    img.parentElement.textContent = `Photo ${i + 7} not found`;
+    img.parentElement.textContent = `image ${i + 7}.jpg not found`;
   };
 
   car.append(s);
@@ -433,13 +463,50 @@ let blown = false, stream, actx;
 function out(){
   if(blown) return; blown = true;
   $('#cake').classList.add('out'); burst(220); setTimeout(()=>burst(120),600);
-  $('#wish').textContent = 'May every wish come true, ' + NAME + ' 💖';
   $('#hint2').textContent = ''; $('#bar').style.width = '0';
   $('#mic').style.display = 'none'; $('#blow').style.display = 'none';
   if(navigator.vibrate) navigator.vibrate([120,60,200]);
   if(stream) stream.getTracks().forEach(t=>t.stop());
   if(actx) actx.close();
+  // the "make a wish" message fades away, then the cut-the-cake prompt appears
+  const cm = $('#cakeMsg');
+  cm.style.opacity = '0';
+  setTimeout(()=>{
+    cm.textContent = 'Now cut the cake 🍰';
+    cm.style.opacity = '1';
+    $('#cutbtn').style.display = 'inline-block';
+    $('#cake').classList.add('ready');
+  }, 1300);
 }
+let cutDone = false;
+function cutCake(){
+  const cake = $('#cake');
+  if(!blown || cutDone || !cake.classList.contains('ready')) return;
+  cutDone = true;
+  cake.classList.remove('ready');
+  $('#cutbtn').style.display = 'none';
+  $('#cakeMsg').style.opacity = '0';
+  cake.classList.add('knifing');
+  if(navigator.vibrate) navigator.vibrate(60);
+  // knife goes down the middle, then the two halves move apart
+  setTimeout(()=>{
+    const main = cake.querySelector('svg.main');
+    const L = main.cloneNode(true), R = main.cloneNode(true);
+    L.setAttribute('class','layer hl'); R.setAttribute('class','layer hr');
+    L.setAttribute('aria-hidden','true'); R.setAttribute('aria-hidden','true');
+    main.style.visibility = 'hidden';
+    cake.append(L, R);
+    void cake.offsetWidth;
+    cake.classList.add('cut');
+    burst(260); setTimeout(()=>burst(140),500);
+    if(navigator.vibrate) navigator.vibrate([80,40,120]);
+  }, 750);
+  setTimeout(()=>{
+    $('#wish').textContent = 'May every wish come true, ' + NAME + ' 💖';
+  }, 1900);
+}
+$('#cake').onclick = cutCake;
+$('#cutbtn').onclick = cutCake;
 async function listen(){
   try{
     stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
