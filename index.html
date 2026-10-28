@@ -181,25 +181,62 @@ Happy Birthday, my heart. ♥</p>
 
 <script>
 // ✏️ PERSONALIZE HERE
+
 const NAME = "My Love";
 const SIGN = "Yours always";
+
 const letters = [
-  {i:"💌", t:"To My Favorite Person", b:"Dear {n},\n\nOn the day you were born, the world got a little brighter, and I’m so grateful it led me to you. You turn ordinary days into memories I never want to forget.\n\nThank you for your smile, your patience, and the way you make me want to be a better person every single day.\n\n{s} ♥"},
-  {i:"🌹", t:"What You Mean To Me", b:"{n},\n\nI never knew how much peace one person could bring until you walked into my life. With you, silence feels comfortable, laughter comes easily, and home is wherever you are.\n\nYou are my calm, my favorite adventure and my best friend.\n\n{s} ♥"},
-  {i:"✨", t:"My Promise", b:"My dearest {n},\n\nI promise to hold your hand through every season, to cheer louder than anyone for your dreams, and to keep choosing you, today and every day after.\n\nMay this year bring you all the happiness you give to everyone around you.\n\nHappy Birthday, my love.\n\n{s} ♥"}
+  {
+    i: "💌",
+    t: "To My Favorite Person",
+    b: "Dear {n},\n\nOn the day you were born, the world got a little brighter, and I’m so grateful it led me to you. You turn ordinary days into memories I never want to forget.\n\nThank you for your smile, your patience, and the way you make me want to be a better person every single day.\n\n{s} ♥"
+  },
+  {
+    i: "🌹",
+    t: "What You Mean To Me",
+    b: "{n},\n\nI never knew how much peace one person could bring until you walked into my life. With you, silence feels comfortable, laughter comes easily, and home is wherever you are.\n\nYou are my calm, my favorite adventure and my best friend.\n\n{s} ♥"
+  },
+  {
+    i: "✨",
+    t: "My Promise",
+    b: "My dearest {n},\n\nI promise to hold your hand through every season, to cheer louder than anyone for your dreams, and to keep choosing you, today and every day after.\n\nMay this year bring you all the happiness you give to everyone around you.\n\nHappy Birthday, my love.\n\n{s} ♥"
+  }
 ];
+
 const reasons = [
-  ["Your smile","It can fix my worst day in a single second."],
-  ["Your heart","So kind and caring that it inspires me."],
-  ["Your laugh","My favorite sound in the whole world."],
-  ["Your support","You believe in me even when I doubt myself."],
-  ["Your eyes","I could get lost in them forever."],
-  ["Just you","Being exactly who you are. Never change."]
+  ["Your smile", "It can fix my worst day in a single second."],
+  ["Your heart", "So kind and caring that it inspires me."],
+  ["Your laugh", "My favorite sound in the whole world."],
+  ["Your support", "You believe in me even when I doubt myself."],
+  ["Your eyes", "I could get lost in them forever."],
+  ["Just you", "Being exactly who you are. Never change."]
 ];
-const caps = ["Our first smile","Beautiful you","Favorite day","Together always","Pure joy","Forever mine"];
+
+const reasonPhotos = [
+  "photos/image%2015.jpg",
+  "photos/image%2016.jpg",
+  "photos/image%2017.jpg",
+  "photos/image%2018.jpg",
+  "photos/image%2019.jpg",
+  "photos/image%2020.jpg"
+];
+
+const caps = [
+  "Our first smile",
+  "Beautiful you",
+  "Favorite day",
+  "Together always",
+  "Pure joy",
+  "Forever mine"
+];
 
 const $ = s => document.querySelector(s);
-document.getElementById('nm').textContent = NAME;
+
+document.getElementById("nm").textContent = NAME;
+
+// Photos for the six reasons cards
+// Use these paths when generating the existing cards.
+
 
 // Gallery
 
@@ -253,16 +290,63 @@ caps.forEach((c, i) => {
 });
 
 // Memory slideshow (8 photos)
-const car = $('#car'), dots = $('#dots');
-for(let i=1;i<=8;i++){
-  const s = document.createElement('div'); s.className='sl';
-  s.innerHTML = `<div class="ph"><span>📷</span>Add memory ${i}</div><div class="cap" contenteditable="true" spellcheck="false">Memory ${i}</div>`;
-  const ph = s.querySelector('.ph'), inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.hidden=true;
-  ph.onclick = () => inp.click();
-  inp.onchange = () => { const f = inp.files[0]; if(!f) return; ph.style.backgroundImage = `url(${URL.createObjectURL(f)})`; ph.innerHTML=''; };
-  s.append(inp); car.append(s); dots.append(document.createElement('i'));
-}
-car.onscroll = () => { const k = Math.round(car.scrollLeft / (car.children[0].offsetWidth + 14)); [...dots.children].forEach((d,j)=>d.classList.toggle('on', j===k)); };
+
+ // Memory slideshow (8 fixed photos)
+const car = $('#car');
+const dots = $('#dots');
+
+const memoryPhotos = [
+  'photos/photo%207.jpg',
+  'photos/photo%208.jpg',
+  'photos/photo%209.jpg',
+  'photos/photo%2010.jpg',
+  'photos/photo%2011.jpg',
+  'photos/photo%2012.jpg',
+  'photos/photo%2013.jpg',
+  'photos/photo%2014.jpg'
+];
+
+memoryPhotos.forEach((photo, i) => {
+  const s = document.createElement('div');
+  s.className = 'sl';
+
+  s.innerHTML = `
+    <div class="ph">
+      <img
+        src="${photo}"
+        alt="Memory ${i + 1}"
+        style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"
+      >
+    </div>
+    <div class="cap" contenteditable="true" spellcheck="false">
+      Memory ${i + 1}
+    </div>
+  `;
+
+  const img = s.querySelector('img');
+
+  img.onerror = () => {
+    img.style.display = 'none';
+    img.parentElement.textContent = `Photo ${i + 7} not found`;
+  };
+
+  car.append(s);
+  dots.append(document.createElement('i'));
+});
+
+car.onscroll = () => {
+  const slide = car.children[0];
+  if (!slide) return;
+
+  const k = Math.round(
+    car.scrollLeft / (slide.offsetWidth + 14)
+  );
+
+  [...dots.children].forEach((d, j) => {
+    d.classList.toggle('on', j === k);
+  });
+};
+
 car.onscroll();
 
 // Background song
