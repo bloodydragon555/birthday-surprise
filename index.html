@@ -306,6 +306,18 @@ const memoryPhotos = [
   'photos/photo%2014.jpg'
 ];
 
+// ✏️ Slideshow captions: apni ek-ek line yahan likho (photo 7 se photo 14 ke order me)
+const memoryCaps = [
+  "The day my world got brighter",
+  "Your smile, my favorite view",
+  "Tiny moments, big happiness",
+  "Lost in your laughter",
+  "Every trip is better with you",
+  "Quiet days, loud hearts",
+  "You make ordinary days magical",
+  "And this is only the beginning"
+];
+
 memoryPhotos.forEach((photo, i) => {
   const s = document.createElement('div');
   s.className = 'sl';
@@ -318,9 +330,7 @@ memoryPhotos.forEach((photo, i) => {
         style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"
       >
     </div>
-    <div class="cap" contenteditable="true" spellcheck="false">
-      Memory ${i + 1}
-    </div>
+    <div class="cap" contenteditable="true" spellcheck="false">${memoryCaps[i] || ''}</div>
   `;
 
   const img = s.querySelector('img');
@@ -381,14 +391,18 @@ $('#cl').onclick = () => { clearTimeout(tm); $('#modal').classList.remove('on');
 $('#modal').onclick = e => { if(e.target.id==='modal') $('#cl').click(); };
 
 // Reasons
-reasons.forEach(r=>{
+reasons.forEach((r, idx)=>{
   const f = document.createElement('div'); f.className='flip rev';
   f.innerHTML = `<div><i class="f"><button class="cam" aria-label="Add photo">📷</button><span>${r[0]}</span></i><i class="b">${r[1]}</i></div>`;
   const front = f.querySelector('.f'), cam = f.querySelector('.cam');
+  // Auto-load photo (image 15 - image 20); gradient stays as fallback if file is missing
+  front.style.backgroundImage = `url("${reasonPhotos[idx]}"), linear-gradient(135deg,#ff6b9d,#9b4dff)`;
+  front.style.backgroundSize = 'cover';
+  front.style.backgroundPosition = 'center';
   const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.hidden=true;
   inp.onclick = e => e.stopPropagation();
   cam.onclick = e => { e.stopPropagation(); inp.click(); };
-  inp.onchange = () => { const x = inp.files[0]; if(!x) return; front.style.backgroundImage = `url(${URL.createObjectURL(x)})`; cam.textContent = '✏️'; };
+  inp.onchange = () => { const x = inp.files[0]; if(!x) return; front.style.backgroundImage = `url(${URL.createObjectURL(x)})`; front.style.backgroundSize='cover'; front.style.backgroundPosition='center'; cam.textContent = '✏️'; };
   f.append(inp);
   f.onclick = () => f.classList.toggle('on');
   $('#rs').append(f);
